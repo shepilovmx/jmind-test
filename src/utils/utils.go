@@ -18,14 +18,15 @@ func (e *HttpError) Error() string {
 }
 
 func ShowHttpError(error *HttpError, w http.ResponseWriter) {
-	log.Printf("%d: %s", error.StatusCode, error.Message)
-	w.WriteHeader(error.StatusCode)
+	log.Printf("Error %d: %s", error.StatusCode, error.Message)
 
 	errObject := map[string]interface{}{
 		"status_code": error.StatusCode,
 		"message":     error.Message,
 	}
 	msg, _ := json.Marshal(errObject)
+
+	w.WriteHeader(error.StatusCode)
 	w.Write(msg)
 }
 

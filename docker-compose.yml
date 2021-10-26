@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+
+  jmind-test-api:
+    environment:
+      - DB_ADDR=postgres:5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=jmind-test
+      - ETHERSCAN_API_URL=http://api.etherscan.io/api
+      - ETHERSCAN_API_KEY=YourApiKeyToken
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jmind-test-api
+    hostname: jmind-test-api
+    ports:
+      - '5000:5000'
+    restart: on-failure
+    depends_on:
+      - postgres
+    networks:
+      - jmind-test
+
+  postgres:
+    image: postgres:latest
+    container_name: db_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=jmind-test
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - jmind-test
+
+# Networks to be created to facilitate communication between containers
+networks:
+  jmind-test:
+    driver: bridge
