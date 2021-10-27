@@ -1,6 +1,20 @@
 version: "3.7"
 services:
 
+  postgres:
+    image: postgres:latest
+    container_name: db_postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=jmind-test
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - jmind-test
+
   jmind-test-api:
     environment:
       - DB_ADDR=postgres:5432
@@ -19,20 +33,6 @@ services:
     restart: on-failure
     depends_on:
       - postgres
-    networks:
-      - jmind-test
-
-  postgres:
-    image: postgres:latest
-    container_name: db_postgres
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=jmind-test
-    ports:
-      - '5432:5432'
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - jmind-test
 

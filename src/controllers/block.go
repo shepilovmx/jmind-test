@@ -41,10 +41,7 @@ func (self *BlockController) Total(w http.ResponseWriter, r *http.Request) *util
 
 		log.Printf("Block %d has been received.", blockNumber)
 
-		totals, err = block.GetBlockTotals()
-		if err != nil {
-			return &utils.HttpError{StatusCode: http.StatusInternalServerError, Message: err.Error()}
-		}
+		totals = block.GetBlockTotals()
 
 		_, err = repositories.BlockTotalsRep.InsertNewBlockTotals(totals)
 		if err != nil {

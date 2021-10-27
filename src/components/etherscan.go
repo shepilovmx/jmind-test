@@ -6,31 +6,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"jmind-test/src/models"
-	"jmind-test/src/utils"
-	"math/big"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 )
 
 type Etherscan struct{}
 
 var EtherscanApi *Etherscan
 
-type Transaction struct {
-	Value string
-}
-
-type Block struct {
-	BlockNumber int
-	Result      *struct {
-		Transactions []*Transaction
-	}
-}
-
-func (_ *Etherscan) GetBlockByNumberRequest(blockNumber int) (*Block, error) {
-	blockData := Block{
+func (_ *Etherscan) GetBlockByNumberRequest(blockNumber int) (*models.Block, error) {
+	blockData := models.Block{
 		BlockNumber: blockNumber,
 	}
 
@@ -60,26 +46,4 @@ func (_ *Etherscan) GetBlockByNumberRequest(blockNumber int) (*Block, error) {
 	}
 
 	return &blockData, nil
-}
-
-func (block *Block) GetBlockTotals() (*models.BlockTotals, error) {
-	totalAmount := big.NewFloat(0)
-	transactionsCount := len(block.Result.Transactions)
-
-	for _, transaction := range block.Result.Transactions {
-		numberStr := strings.Replace(transaction.Value, "0x", "", -1)
-
-		num := new(big.Int)
-		num.SetString(numberStr, 16)
-
-		totalAmount.Add(totalAmount, utils.WeiToEther(num))
-	}
-
-	totalAmountFloat64, _ := totalAmount.Float64()
-
-	return &models.BlockTotals{
-		BlockNumber:  block.BlockNumber,
-		Transactions: transactionsCount,
-		Amount:       totalAmountFloat64,
-	}, nil
 }
